@@ -5,7 +5,6 @@ function getTransitURL(path, parameters) {
   url.pathname = `v3/${path}.json`;
   let params = new URLSearchParams();
   params.set('api-key', `${process.env.API_KEY}`);
-  params.set('bbox', '-97.325875,49.766204,-96.953987,49.99275')
 
   for (const [key, value] of Object.entries(parameters)) {
     params.append(key, value);
@@ -21,6 +20,7 @@ function getMapUrl (path, parameters) {
   url.pathname = `geocoding/v5/mapbox.places/${path}.json`;
   let params = new URLSearchParams();
   params.set('access_token', `${process.env.API_TOKEN}`);
+  params.set('bbox', '-97.325875,49.766204,-96.953987,49.99275')
 
   for (const [key, value] of Object.entries(parameters)) {
     params.append(key, value);

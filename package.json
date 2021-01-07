@@ -14,5 +14,8 @@
   "license": "ISC",
   "devDependencies": {
     "dotenv": "^8.2.0"
+  },
+  "dependencies": {
+    "regenerator-runtime": "^0.13.7"
   }
 }
