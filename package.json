@@ -1,0 +1,18 @@
+{
+  "name": "trip-planner",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "parcel ./index.html",
+    "clean": "rimraf dist",
+    "build": "parcel build ./index.html",
+    "surge": "surge -d https://leo-trip-planner.surge.sh dist",
+    "deploy": "run-s clean build surge"
+  },
+  "author": "Jiye Li <jiyeli103@gmail.com> (https://leona.surge.sh/)",
+  "license": "ISC",
+  "devDependencies": {
+    "dotenv": "^8.2.0"
+  }
+}
