@@ -15,16 +15,12 @@ function getTransitURL(path, parameters) {
   return url.href;
 }
 
-function getMapUrl (path, parameters) {
+function getMapUrl(path) {
   const url = new URL('https://api.mapbox.com');
   url.pathname = `geocoding/v5/mapbox.places/${path}.json`;
   let params = new URLSearchParams();
   params.set('access_token', `${process.env.API_TOKEN}`);
-  params.set('bbox', '-97.325875,49.766204,-96.953987,49.99275')
-
-  for (const [key, value] of Object.entries(parameters)) {
-    params.append(key, value);
-  }
+  params.set('bbox', '-97.325875,49.766204,-96.953987,49.99275');
 
   url.search = params.toString();
 

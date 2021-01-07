@@ -16,7 +16,7 @@ const destinationInputHandler = e => {
 };
 
 const getResultsOfOrigin = async origin => {
-  const res = await fetch(getMapUrl(`${origin}`, {}));
+  const res = await fetch(getMapUrl(`${origin}`));
   const {features} = await res.json();
   features.map(feature => {
     const {place_name, text, center} = feature;
@@ -25,7 +25,7 @@ const getResultsOfOrigin = async origin => {
 };
 
 const getResultsOfDestination = async destination => {
-  const res = await fetch(getMapUrl(`${destination}`, {}));
+  const res = await fetch(getMapUrl(`${destination}`));
   const {features} = await res.json();
   features.map(feature => {
     const {place_name, text, center} = feature;
