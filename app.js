@@ -1,6 +1,12 @@
 import {getTransitURL, getMapUrl} from './url';
 import regeneratorRuntime from 'regenerator-runtime';
 
+const cleanUp = () => {
+  originList.innerHTML = '';
+  destinationList.innerHTML = '';
+  tripPlan.innerHTML = '';
+};
+
 const originInputHandler = e => {
   if (e.keyCode == 13) {
     e.preventDefault();
@@ -63,6 +69,8 @@ const originInput = document.querySelector('.origin-form input');
 const destinationInput = document.querySelector('.destination-form input');
 const originList = document.querySelector('.origins');
 const destinationList = document.querySelector('.destinations');
+const tripPlan = document.querySelector('.my-trip');
 
+window.addEventListener('load', cleanUp);
 originInput.addEventListener('keypress', e => originInputHandler(e));
 destinationInput.addEventListener('keypress', e => destinationInputHandler(e));
