@@ -65,12 +65,29 @@ const showDestinationList = (name, address, lon, lat) => {
   );
 };
 
+const activeSelection = e => {
+  const target = e.target.closest('li');
+  if (e.target.tagName !== 'UL') {
+    if (list.length === 0) {
+      target.classList.add('selected');
+      list.push(target);
+    } else if (list.length > 0) {
+      list.pop().classList.remove('selected');
+      target.classList.add('selected');
+      list.push(target);
+    }
+  }
+};
+
 const originInput = document.querySelector('.origin-form input');
 const destinationInput = document.querySelector('.destination-form input');
 const originList = document.querySelector('.origins');
 const destinationList = document.querySelector('.destinations');
 const tripPlan = document.querySelector('.my-trip');
+let list = [];
 
 window.addEventListener('load', cleanUp);
 originInput.addEventListener('keypress', e => originInputHandler(e));
 destinationInput.addEventListener('keypress', e => destinationInputHandler(e));
+originList.addEventListener('click', e => activeSelection(e));
+destinationList.addEventListener('click', e => activeSelection(e));
