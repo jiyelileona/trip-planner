@@ -67,16 +67,62 @@ const showDestinationList = (name, address, lon, lat) => {
 
 const activeSelection = e => {
   const target = e.target.closest('li');
-  if (e.target.tagName !== 'UL') {
-    if (list.length === 0) {
+  if (e.target.tagName !== 'UL' && e.target.closest('ul').classList.contains('origins')) {
+    if (list1.length === 0) {
       target.classList.add('selected');
-      list.push(target);
-    } else if (list.length > 0) {
-      list.pop().classList.remove('selected');
+      list1.push(target);
+    } else if (list1.length > 0) {
+      list1.pop().classList.remove('selected');
       target.classList.add('selected');
-      list.push(target);
+      list1.push(target);
+    }
+  } else if (
+    e.target.tagName !== 'UL' &&
+    e.target.closest('ul').classList.contains('destinations')
+  ) {
+    if (list2.length === 0) {
+      target.classList.add('selected');
+      list2.push(target);
+    } else if (list1.length > 0) {
+      list2.pop().classList.remove('selected');
+      target.classList.add('selected');
+      list2.push(target);
     }
   }
+  getData(list1, list2);
+};
+
+const getData = (list1, list2) => {
+  if (list1.length !== 0 && list2.length !== 0) {
+    getLocationData(
+      list1[0].getAttribute('data-long'),
+      list1[0].getAttribute('data-lat'),
+      list2[0].getAttribute('data-long'),
+      list2[0].getAttribute('data-lat')
+    );
+  }
+};
+
+const getLocationData = async (lon1, lat1, lon2, lat2) => {
+  const res1 = await fetch(getTransitURL('locations', {lon: lon1, lat: lat1, 'max-results': 1}));
+  const data1 = await res1.json();
+  const res2 = await fetch(getTransitURL('locations', {lon: lon2, lat: lat2, 'max-results': 1}));
+  const data2 = await res2.json();
+  getTripPlan(data1.locations[0], data2.locations[0]);
+};
+
+const getTripPlan = async (origin, destination) => {
+  origin.type = origin.type == 'address' ? origin.type + 'es' : origin.type + 's';
+  destination.type =
+    destination.type == 'address' ? destination.type + 'es' : destination.type + 's';
+
+  const res = await fetch(
+    getTransitURL('trip-planner', {
+      origin: `${origin.type}/${origin.key}`,
+      destination: `${destination.type}/${destination.key}`,
+    })
+  );
+  const {plans} = await res.json();
 };
 
 const originInput = document.querySelector('.origin-form input');
@@ -84,7 +130,8 @@ const destinationInput = document.querySelector('.destination-form input');
 const originList = document.querySelector('.origins');
 const destinationList = document.querySelector('.destinations');
 const tripPlan = document.querySelector('.my-trip');
-let list = [];
+let list1 = [];
+let list2 = [];
 
 window.addEventListener('load', cleanUp);
 originInput.addEventListener('keypress', e => originInputHandler(e));
