@@ -1,4 +1,5 @@
 import {getTransitURL, getMapUrl} from './url';
+import filter from './filter';
 import regeneratorRuntime from 'regenerator-runtime';
 
 const cleanUp = () => {
@@ -89,10 +90,9 @@ const activeSelection = e => {
       list2.push(target);
     }
   }
-  getData(list1, list2);
 };
 
-const getData = (list1, list2) => {
+const getData = () => {
   if (list1.length !== 0 && list2.length !== 0) {
     getLocationData(
       list1[0].getAttribute('data-long'),
@@ -123,6 +123,51 @@ const getTripPlan = async (origin, destination) => {
     })
   );
   const {plans} = await res.json();
+  const {segments} = plans[0];
+  segments.map(segment => {
+    const {from, times, to, route, type} = segment;
+    planDataHandler({from: from, times: times, to: to, route: route, type: type});
+  });
+};
+
+const planDataHandler = data => {
+  const plan = filter(data, value => value !== undefined);
+  let text, minute, icon;
+  minute = plan.times.durations.total > 1 ? 'minutes' : 'minute';
+
+  switch (plan.type) {
+    case 'walk':
+      text = `Walk for ${plan.times.durations.total} ${minute} to ${
+        plan.from.origin == undefined
+          ? 'your destination'
+          : `stop #${plan.to.stop.key} - ${plan.to.stop.name}`
+      }`;
+      icon = 'fa-walking';
+      break;
+    case 'ride':
+      text = `Ride the ${plan.route.name == undefined ? plan.route.key : plan.route.name} for ${
+        plan.times.durations.total
+      } ${minute}`;
+      icon = 'fa-bus';
+      break;
+    case 'transfer':
+      text = `Transfer from stop #${plan.from.stop.key} - ${plan.from.stop.name} to stop #${plan.to.stop.key} - ${plan.to.stop.name}`;
+      icon = 'fa-ticket-alt';
+      break;
+  }
+
+  createPLanHTML(icon, text);
+};
+
+const createPLanHTML = (icon, text) => {
+  tripPlan.insertAdjacentHTML(
+    'beforeend',
+    `
+    <li>
+      <i class="fas ${icon}" aria-hidden="true"></i>${text}
+    </li>
+  `
+  );
 };
 
 const originInput = document.querySelector('.origin-form input');
@@ -130,6 +175,7 @@ const destinationInput = document.querySelector('.destination-form input');
 const originList = document.querySelector('.origins');
 const destinationList = document.querySelector('.destinations');
 const tripPlan = document.querySelector('.my-trip');
+const button = document.querySelector('button');
 let list1 = [];
 let list2 = [];
 
@@ -138,3 +184,4 @@ originInput.addEventListener('keypress', e => originInputHandler(e));
 destinationInput.addEventListener('keypress', e => destinationInputHandler(e));
 originList.addEventListener('click', e => activeSelection(e));
 destinationList.addEventListener('click', e => activeSelection(e));
+button.addEventListener('click', getData);
