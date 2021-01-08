@@ -1,5 +1,4 @@
 import {getTransitURL, getMapUrl} from './func/url';
-import filter from './func/filter';
 import regeneratorRuntime from 'regenerator-runtime';
 
 const originInputHandler = e => {
@@ -60,9 +59,9 @@ const showDestinationList = (name, address, lon, lat) => {
   );
 };
 
-const activeSelection = e => {
-  const target = e.target.closest('li');
-  if (e.target.tagName !== 'UL' && e.target.closest('ul').classList.contains('origins')) {
+const activeSelection = ele => {
+  const target = ele.closest('li');
+  if (ele.tagName !== 'UL' && ele.closest('ul').classList.contains('origins')) {
     if (list1.length === 0) {
       target.classList.add('selected');
       list1.push(target);
@@ -71,10 +70,7 @@ const activeSelection = e => {
       target.classList.add('selected');
       list1.push(target);
     }
-  } else if (
-    e.target.tagName !== 'UL' &&
-    e.target.closest('ul').classList.contains('destinations')
-  ) {
+  } else if (ele.tagName !== 'UL' && ele.closest('ul').classList.contains('destinations')) {
     if (list2.length === 0) {
       target.classList.add('selected');
       list2.push(target);
@@ -121,32 +117,29 @@ const getTripPlan = async (origin, destination) => {
   const {segments} = plans[0];
   segments.map(segment => {
     const {from, times, to, route, type} = segment;
-    planDataHandler({from: from, times: times, to: to, route: route, type: type});
+    planDataHandler(from, times, to, route, type);
   });
 };
 
-const planDataHandler = data => {
-  const plan = filter(data, value => value !== undefined);
+const planDataHandler = (from, times, to, route, type) => {
   let text, minute, icon;
-  minute = plan.times.durations.total > 1 ? 'minutes' : 'minute';
+  minute = times.durations.total > 1 ? 'minutes' : 'minute';
 
-  switch (plan.type) {
+  switch (type) {
     case 'walk':
-      text = `Walk for ${plan.times.durations.total} ${minute} to ${
-        plan.from.origin == undefined
-          ? 'your destination'
-          : `stop #${plan.to.stop.key} - ${plan.to.stop.name}`
+      text = `Walk for ${times.durations.total} ${minute} to ${
+        from.origin == undefined ? 'your destination' : `stop #${to.stop.key} - ${to.stop.name}`
       }`;
       icon = 'fa-walking';
       break;
     case 'ride':
-      text = `Ride the ${plan.route.name == undefined ? plan.route.key : plan.route.name} for ${
-        plan.times.durations.total
+      text = `Ride the ${route.name == undefined ? route.key : route.name} for ${
+        times.durations.total
       } ${minute}`;
       icon = 'fa-bus';
       break;
     case 'transfer':
-      text = `Transfer from stop #${plan.from.stop.key} - ${plan.from.stop.name} to stop #${plan.to.stop.key} - ${plan.to.stop.name}`;
+      text = `Transfer from stop #${from.stop.key} - ${from.stop.name} to stop #${to.stop.key} - ${to.stop.name}`;
       icon = 'fa-ticket-alt';
       break;
   }
@@ -176,6 +169,6 @@ let list2 = [];
 
 originInput.addEventListener('keypress', e => originInputHandler(e));
 destinationInput.addEventListener('keypress', e => destinationInputHandler(e));
-originList.addEventListener('click', e => activeSelection(e));
-destinationList.addEventListener('click', e => activeSelection(e));
+originList.addEventListener('click', e => activeSelection(e.target));
+destinationList.addEventListener('click', e => activeSelection(e.target));
 button.addEventListener('click', getData);
