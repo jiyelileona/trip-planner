@@ -13,6 +13,7 @@
   "author": "Jiye Li <jiyeli103@gmail.com> (https://leona.surge.sh/)",
   "license": "ISC",
   "devDependencies": {
+    "cssnano": "^4.1.10",
     "dotenv": "^8.2.0"
   },
   "dependencies": {

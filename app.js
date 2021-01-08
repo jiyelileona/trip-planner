@@ -93,6 +93,7 @@ const activeSelection = e => {
 };
 
 const getData = () => {
+  tripPlan.innerHTML = '';
   if (list1.length !== 0 && list2.length !== 0) {
     getLocationData(
       list1[0].getAttribute('data-long'),
