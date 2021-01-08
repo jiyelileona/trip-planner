@@ -1,12 +1,6 @@
-import {getTransitURL, getMapUrl} from './url';
-import filter from './filter';
+import {getTransitURL, getMapUrl} from './func/url';
+import filter from './func/filter';
 import regeneratorRuntime from 'regenerator-runtime';
-
-const cleanUp = () => {
-  originList.innerHTML = '';
-  destinationList.innerHTML = '';
-  tripPlan.innerHTML = '';
-};
 
 const originInputHandler = e => {
   if (e.keyCode == 13) {
@@ -93,7 +87,6 @@ const activeSelection = e => {
 };
 
 const getData = () => {
-  tripPlan.innerHTML = '';
   if (list1.length !== 0 && list2.length !== 0) {
     getLocationData(
       list1[0].getAttribute('data-long'),
@@ -102,6 +95,7 @@ const getData = () => {
       list2[0].getAttribute('data-lat')
     );
   }
+  tripPlan.innerHTML = '';
 };
 
 const getLocationData = async (lon1, lat1, lon2, lat2) => {
@@ -180,7 +174,6 @@ const button = document.querySelector('button');
 let list1 = [];
 let list2 = [];
 
-window.addEventListener('load', cleanUp);
 originInput.addEventListener('keypress', e => originInputHandler(e));
 destinationInput.addEventListener('keypress', e => destinationInputHandler(e));
 originList.addEventListener('click', e => activeSelection(e));
