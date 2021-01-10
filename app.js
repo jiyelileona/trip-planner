@@ -5,7 +5,11 @@ const originInputHandler = e => {
   if (e.keyCode == 13) {
     e.preventDefault();
     originList.innerHTML = '';
-    getResultsOfOrigin(e.target.value);
+    if (e.target.value !== '') {
+      getResultsOfOrigin(e.target.value);
+    } else {
+      tripPlan.innerHTML = '<li>Please enter your origin</li>';
+    }
   }
 };
 
@@ -13,26 +17,40 @@ const destinationInputHandler = e => {
   if (e.keyCode == 13) {
     e.preventDefault();
     destinationList.innerHTML = '';
-    getResultsOfDestination(e.target.value);
+    if (e.target.value !== '') {
+      getResultsOfDestination(e.target.value);
+    } else {
+      tripPlan.innerHTML = '<li>Please enter your destination</li>';
+    }
   }
 };
 
 const getResultsOfOrigin = async origin => {
   const res = await fetch(getMapUrl(`${origin}`));
   const {features} = await res.json();
-  features.map(feature => {
-    const {place_name, text, center} = feature;
-    showOriginList(text, place_name.split(',')[1], center[0], center[1]);
-  });
+  if (features.length !== 0) {
+    features.map(feature => {
+      const {place_name, text, center} = feature;
+      showOriginList(text, place_name.split(',')[1], center[0], center[1]);
+    });
+  } else {
+    originInput.value = '';
+    tripPlan.innerHTML = '<li>sorry, no origin information found</li>';
+  }
 };
 
 const getResultsOfDestination = async destination => {
   const res = await fetch(getMapUrl(`${destination}`));
   const {features} = await res.json();
-  features.map(feature => {
-    const {place_name, text, center} = feature;
-    showDestinationList(text, place_name.split(',')[1], center[0], center[1]);
-  });
+  if (features.length !== 0) {
+    features.map(feature => {
+      const {place_name, text, center} = feature;
+      showDestinationList(text, place_name.split(',')[1], center[0], center[1]);
+    });
+  } else {
+    destinationInput.value = '';
+    tripPlan.innerHTML = '<li>sorry, no destination information found</li>';
+  }
 };
 
 const showOriginList = (name, address, lon, lat) => {
@@ -83,15 +101,26 @@ const activeSelection = ele => {
 };
 
 const getData = () => {
-  if (list1.length !== 0 && list2.length !== 0) {
-    getLocationData(
-      list1[0].getAttribute('data-long'),
-      list1[0].getAttribute('data-lat'),
-      list2[0].getAttribute('data-long'),
-      list2[0].getAttribute('data-lat')
-    );
-  }
   tripPlan.innerHTML = '';
+  if (list1.length !== 0 && list2.length !== 0) {
+    if (
+      list1[0].getAttribute('data-long') == list2[0].getAttribute('data-long') &&
+      list1[0].getAttribute('data-lat') == list2[0].getAttribute('data-lat')
+    ) {
+      tripPlan.innerHTML = '<li>you cannot have duplicate location</li>';
+    } else {
+      getLocationData(
+        list1[0].getAttribute('data-long'),
+        list1[0].getAttribute('data-lat'),
+        list2[0].getAttribute('data-long'),
+        list2[0].getAttribute('data-lat')
+      );
+    }
+  } else if (originInput.value == '' || destinationInput.value == '') {
+    tripPlan.innerHTML = '<li>please enter a valid location</li>';
+  } else if (list1.length == 0 || list2.length == 0) {
+    tripPlan.innerHTML = '<li>please select a location</li>';
+  }
 };
 
 const getLocationData = async (lon1, lat1, lon2, lat2) => {
@@ -114,19 +143,25 @@ const getTripPlan = async (origin, destination) => {
     })
   );
   const {plans} = await res.json();
-  const {segments} = plans[0];
-  segments.map(segment => {
-    const {from, times, to, route, type} = segment;
-    planDataHandler(from, times, to, route, type);
+  let counter = 0;
+  plans.map(plan => {
+    counter++;
+    let {segments} = plan;
+    segments.map(segment => {
+      const {from, times, to, route, type} = segment;
+      planDataHandler(from, times, to, route, type, counter);
+    });
   });
 };
 
-const planDataHandler = (from, times, to, route, type) => {
+const planDataHandler = (from, times, to, route, type, count) => {
   let text, minute, icon;
+  let header = false;
   minute = times.durations.total > 1 ? 'minutes' : 'minute';
 
   switch (type) {
     case 'walk':
+      header = from.origin == undefined ? false : true;
       text = `Walk for ${times.durations.total} ${minute} to ${
         from.origin == undefined ? 'your destination' : `stop #${to.stop.key} - ${to.stop.name}`
       }`;
@@ -144,13 +179,14 @@ const planDataHandler = (from, times, to, route, type) => {
       break;
   }
 
-  createPLanHTML(icon, text);
+  createPLanHTML(icon, text, header, count);
 };
 
-const createPLanHTML = (icon, text) => {
+const createPLanHTML = (icon, text, header, count) => {
   tripPlan.insertAdjacentHTML(
     'beforeend',
     `
+    ${header ? `<h2>Plan ${count} ${count == 1 ? '(recommend)' : ''}</h2>` : ''}
     <li>
       <i class="fas ${icon}" aria-hidden="true"></i>${text}
     </li>

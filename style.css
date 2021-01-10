@@ -19,18 +19,38 @@ ul {
   padding: 0;
 }
 
-.origins > li, .destinations > li {
+.origin-container {
+  z-index: 2;
+}
+
+.destination-container {
+  z-index: 2;
+}
+
+.button-container {
+  z-index: 2;
+}
+
+.bus-container {
+  z-index: 2;
+}
+
+.origins > li,
+.destinations > li {
   padding: 20px 20px;
   border: 1px solid #d3d3d3;
   margin: 5px 0;
+  background-color: #fff;
 }
 
-.origins > li:hover, .destinations > li:hover{
+.origins > li:hover,
+.destinations > li:hover {
   background-color: #efefef;
   cursor: pointer;
 }
 
-.origins > li.selected, .destinations > li.selected {
+.origins > li.selected,
+.destinations > li.selected {
   background-color: #f2f3ff;
 }
 
@@ -64,6 +84,7 @@ input:focus {
 .my-trip {
   width: 75%;
   margin: auto;
+  background-color: #fff;
 }
 
 .my-trip li {
